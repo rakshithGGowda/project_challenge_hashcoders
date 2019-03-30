@@ -63,8 +63,8 @@ while True:
         y = approx.ravel()[1]
         color = cl.label(lab, cnt)
  
-        if area > 400:
-            cv2.drawContours(frame, [approx], 0, (0, 0, 0), 5)
+        if area > 300:
+            cv2.drawContours(frame, [approx], 0, (0, 0, 0), 2)
  
             if len(approx) == 3:
                 cv2.putText(frame, "Triangle"+"   "+str(color), (x, y), font, 1, (0, 0, 0))
@@ -72,7 +72,7 @@ while True:
                 cv2.putText(frame, "Rectangle"+"   "+str(color), (x, y), font, 1, (0, 0, 0))
             elif len(approx) == 5:
                 cv2.putText (frame, "pentagon"+"   "+str(color), (x, y), font, 1,(0,0,0))
-            elif len(approx) == 5:
+            elif len(approx) == 6:
                 cv2.putText (frame, "hexagon"+"   "+str(color), (x,y),font, 1,(0,0,0))
             elif 10 < len(approx) < 20:
                 cv2.putText(frame, "Circle"+"   "+str(color), (x, y), font, 1, (0, 0, 0))
