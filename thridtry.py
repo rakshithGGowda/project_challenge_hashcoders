@@ -1,5 +1,7 @@
 import numpy as np
 import cv2
+import imutils
+from sam.colorlabeler import ColorLabeler
 def nothing(x):
     # any operation
     pass
@@ -19,6 +21,23 @@ font = cv2.FONT_HERSHEY_COMPLEX
 while True:
     _, frame = cap.read()
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+
+
+
+    
+    blurred = cv2.GaussianBlur(frame, (5, 5), 0)
+    gray = cv2.cvtColor(blurred, cv2.COLOR_BGR2GRAY)
+    lab = cv2.cvtColor(blurred, cv2.COLOR_BGR2LAB)
+    thresh = cv2.threshold(gray, 60, 255, cv2.THRESH_BINARY)[1]
+
+
+    cnts = cv2.findContours(thresh.copy(), cv2.RETR_EXTERNAL,
+	cv2.CHAIN_APPROX_SIMPLE)
+    cnts = imutils.grab_contours(cnts)
+
+
+    cl = ColorLabeler()
+    
  
     l_h = cv2.getTrackbarPos("L-H", "Trackbars")
     l_s = cv2.getTrackbarPos("L-S", "Trackbars")
@@ -42,24 +61,26 @@ while True:
         approx = cv2.approxPolyDP(cnt, 0.02*cv2.arcLength(cnt, True), True)
         x = approx.ravel()[0]
         y = approx.ravel()[1]
+        color = cl.label(lab, cnt)
  
         if area > 400:
             cv2.drawContours(frame, [approx], 0, (0, 0, 0), 5)
  
             if len(approx) == 3:
-                cv2.putText(frame, "Triangle", (x, y), font, 1, (0, 0, 0))
+                cv2.putText(frame, "Triangle"+"   "+str(color), (x, y), font, 1, (0, 0, 0))
             elif len(approx) == 4:
-                cv2.putText(frame, "Rectangle", (x, y), font, 1, (0, 0, 0))
+                cv2.putText(frame, "Rectangle"+"   "+str(color), (x, y), font, 1, (0, 0, 0))
             elif len(approx) == 5:
-                cv2.putText (frame, "pentagon", (x, y), font, 1,(0,0,0))
+                cv2.putText (frame, "pentagon"+"   "+str(color), (x, y), font, 1,(0,0,0))
             elif len(approx) == 5:
-                cv2.putText (frame, "hexagon", (x,y),font, 1,(0,0,0))
+                cv2.putText (frame, "hexagon"+"   "+str(color), (x,y),font, 1,(0,0,0))
             elif 10 < len(approx) < 20:
-                cv2.putText(frame, "Circle", (x, y), font, 1, (0, 0, 0))
+                cv2.putText(frame, "Circle"+"   "+str(color), (x, y), font, 1, (0, 0, 0))
  
  
     cv2.imshow("Frame", frame)
     cv2.imshow("Mask", mask)
+    cv2.imshow("Thresh", thresh)
  
     key = cv2.waitKey(1)
     if key == 27:
